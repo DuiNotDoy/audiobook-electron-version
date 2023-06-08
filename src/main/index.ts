@@ -52,6 +52,9 @@ app.whenReady().then(() => {
         optimizer.watchWindowShortcuts(window)
     })
 
+    //create folder for saving data
+    createMainPathIfNotExists()
+
     createWindow()
 
     app.on('activate', function() {
@@ -63,12 +66,7 @@ app.whenReady().then(() => {
 
 ipcMain.on('media:save', (e, data) => {
     const { audioPath, thumbNailPath } = data
-    const home = os.homedir()
-    const mainPath = `${home}/Music/audiobook-data`
-
-    if (!fs.existsSync(mainPath)) {
-        fs.mkdirSync(mainPath)
-    }
+    const mainPath = createMainPathIfNotExists()
 
     saveAudio(audioPath, `${mainPath}/audios`)
     saveThumbNail(thumbNailPath, `${mainPath}/thumbnails`)
@@ -86,6 +84,16 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+function createMainPathIfNotExists(): string {
+    const home = os.homedir()
+    const mainPath = `${home}/Music/audiobook-data`
+
+    if (!fs.existsSync(mainPath)) {
+        fs.mkdirSync(mainPath)
+    }
+    return mainPath
+}
 
 function saveAudio(sourcePath: string, dest: string) {
     if (!fs.existsSync(dest)) {
