@@ -65,12 +65,17 @@ app.whenReady().then(() => {
 })
 
 ipcMain.on('media:save', (e, data) => {
-    const { audioPath, thumbNailPath } = data
+    const { storyTitle, audioPath, thumbNailPath } = data
     const mainPath = createMainPathIfNotExists()
 
-    saveAudio(audioPath, `${mainPath}/audios`)
-    saveThumbNail(thumbNailPath, `${mainPath}/thumbnails`)
-    e.reply('media:response', audioPath)
+    try {
+        saveAudio(audioPath, `${mainPath}/audios`, storyTitle)
+        saveThumbNail(thumbNailPath, `${mainPath}/thumbnails`, storyTitle)
+        e.reply('media:response', { success: true, message: 'successfully saved media' })
+    } catch (error) {
+        e.reply('media:response', { success: false, message: 'error occurred while saving the file' })
+    }
+
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -95,19 +100,19 @@ function createMainPathIfNotExists(): string {
     return mainPath
 }
 
-function saveAudio(sourcePath: string, dest: string) {
+function saveAudio(sourcePath: string, dest: string, filename: string) {
     if (!fs.existsSync(dest)) {
         fs.mkdirSync(dest)
     }
 
-    fs.copyFileSync(sourcePath, `${dest}/audio.mp3`)
+    fs.copyFileSync(sourcePath, `${dest}/${filename}.mp3`)
 }
 
-function saveThumbNail(sourcePath: string, dest: string) {
+function saveThumbNail(sourcePath: string, dest: string, filename: string) {
     if (!fs.existsSync(dest)) {
         fs.mkdirSync(dest)
     }
 
-    fs.copyFileSync(sourcePath, `${dest}/thumbnail.jpeg`)
+    fs.copyFileSync(sourcePath, `${dest}/${filename}.jpeg`)
 }
 

@@ -14,46 +14,28 @@ export default function AddBookModal(): JSX.Element {
     const [hasImage, sethasImage] = useState(false)
     const [hasError, sethasError] = useState(false)
 
-    //    function handleError({ error, message }: { error: string; message: string }): void {
-    //        setsubmitting(false)
-    //        alert(`${error}: ${message}`)
-    //    }
-
     function fileUpload(): void {
-        console.log('file upload')
-        sendToMain()
-    }
-
-    function sendToMain(): void {
         setsubmitting(true)
-        const filePaths = {
+        if (hasEmptyField()) {
+            return handleError({ error: 'Empty Field', message: 'Do not leave an empty field' })
+        }
+
+        const mediaData = {
+            storyTitle: title.current?.value,
             audioPath: audioFile?.path,
             thumbNailPath: thumbNail?.path
         }
 
-        window.electron.ipcRenderer.send('media:save', filePaths)
+        window.electron.ipcRenderer.send('media:save', mediaData)
         window.electron.ipcRenderer.on('media:response', (e, data) => {
             console.log({ e })
             console.log(data)
+            if (!data.success) {
+                handleError({ error: 'Crashed', message: 'Error occurred while saving media' })
+            }
             setsubmitting(false)
         })
     }
-
-    //    function hasEmptyField(): boolean {
-    //        return false
-    //    }
-    //
-    //    function processWords({ id, words }: { id: string; words: string }): void {
-    //        console.log({ id, words })
-    //    }
-    //
-    //    function uploadAudio(): void {
-    //        console.log('upload audio')
-    //    }
-    //
-    //    function uploadThumbnail(): void {
-    //        console.log('upload thumbnail')
-    //    }
 
     function setAudio(e: React.FormEvent): void {
         const target = e.target as HTMLInputElement
@@ -73,6 +55,18 @@ export default function AddBookModal(): JSX.Element {
         setthumbNail(target.files[0])
         console.log(thumbNail)
         sethasImage(true)
+    }
+
+    function hasEmptyField(): boolean {
+        if (!title.current?.value || !author.current?.value || !story.current?.value || !audioFile || !thumbNail) {
+            return true
+        }
+        return false
+    }
+
+    function handleError({ error, message }: { error: string; message: string }): void {
+        setsubmitting(false)
+        alert(`${error}: ${message}`)
     }
 
     return (
