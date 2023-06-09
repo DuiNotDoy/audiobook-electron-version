@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import os from 'os'
+import { getAllStory, getStory } from './database'
 
 function createWindow(): void {
     // Create the browser window.
@@ -76,6 +77,33 @@ ipcMain.on('media:save', (e, data) => {
         e.reply('media:response', { success: false, message: 'error occurred while saving the file' })
     }
 
+})
+
+ipcMain.on('data:request', (e, data) => {
+    switch (data.filter) {
+        case 'all':
+            const stories = getAllStory()
+            e.reply('data:response', {success: true, data: stories, type: 'multiple'})
+            break;
+        case 'single':
+            const story = getStory(data.id)
+            e.reply('data:response', {success: true, data: story, type: 'single'})
+            break;
+        default:
+            e.reply('data:response', {success: false, data: null, type: 'error'})
+            break;
+    }
+})
+
+ipcMain.on('data:post', (e, data) => {
+    switch (data.type) {
+        case 'insert':
+            break
+        case 'delete':
+            break
+        default:
+            break
+    }
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

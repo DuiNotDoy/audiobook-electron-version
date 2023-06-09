@@ -1,10 +1,9 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import Buffer from 'node:buffer'
 
 // Custom APIs for renderer
 const api = {
-    renderer: ipcRenderer,
     buffer: (arrayBuffer) => Buffer.Buffer.from(arrayBuffer)
 }
 
