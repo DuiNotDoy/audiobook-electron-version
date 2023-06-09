@@ -70,36 +70,44 @@ ipcMain.on('media:save', (e, data) => {
     const mainPath = createMainPathIfNotExists()
 
     try {
-        saveAudio(audioPath, `${mainPath}/audios`, storyTitle)
-        saveThumbNail(thumbNailPath, `${mainPath}/thumbnails`, storyTitle)
+        fs.copyFileSync(audioPath, `${mainPath}/${storyTitle}.mp3`)
+        fs.copyFileSync(thumbNailPath, `${mainPath}/${storyTitle}.jpeg`)
         e.reply('media:response', { success: true, message: 'successfully saved media' })
     } catch (error) {
-        e.reply('media:response', { success: false, message: 'error occurred while saving the file' })
+        e.reply('media:response', { success: false, message: 'error occurred while saving the files' })
     }
-
 })
 
 ipcMain.on('data:request', (e, data) => {
-    switch (data.filter) {
+    console.log({ e })
+
+    switch (data.type) {
         case 'all':
             const stories = getAllStory()
-            e.reply('data:response', {success: true, data: stories, type: 'multiple'})
+            e.reply('data:response', { success: true, data: stories, type: 'multiple' })
             break;
         case 'single':
             const story = getStory(data.id)
-            e.reply('data:response', {success: true, data: story, type: 'single'})
+            e.reply('data:response', { success: true, data: story, type: 'single' })
             break;
         default:
-            e.reply('data:response', {success: false, data: null, type: 'error'})
+            e.reply('data:response', { success: false, data: null, type: 'error' })
             break;
     }
 })
 
 ipcMain.on('data:post', (e, data) => {
+    console.log({ e })
+
     switch (data.type) {
         case 'insert':
+            // code for inserting data here...
+            break
+        case 'update':
+            // code for updating data here...
             break
         case 'delete':
+            // code for deleting data here...
             break
         default:
             break
@@ -122,25 +130,26 @@ function createMainPathIfNotExists(): string {
     const home = os.homedir()
     const mainPath = `${home}/Music/audiobook-data`
 
+    // Create main folder for app data if it does not exists
     if (!fs.existsSync(mainPath)) {
         fs.mkdirSync(mainPath)
     }
+
+    // Create subfolder for audios if it does not exist
+    if (!fs.existsSync(`${mainPath}/audios`)) {
+        fs.mkdirSync(`${mainPath}/audios`)
+    }
+
+    // Create subfolder for thumbnails if it does not exist
+    if (!fs.existsSync(`${mainPath}/thumbnails`)) {
+        fs.mkdirSync(`${mainPath}/thumbnails`)
+    }
+
+    // Create subfolder for main data if it does not exists
+    if (!fs.existsSync(`${mainPath}/data`)) {
+        fs.mkdirSync(`${mainPath}/data`)
+    }
+
     return mainPath
-}
-
-function saveAudio(sourcePath: string, dest: string, filename: string) {
-    if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest)
-    }
-
-    fs.copyFileSync(sourcePath, `${dest}/${filename}.mp3`)
-}
-
-function saveThumbNail(sourcePath: string, dest: string, filename: string) {
-    if (!fs.existsSync(dest)) {
-        fs.mkdirSync(dest)
-    }
-
-    fs.copyFileSync(sourcePath, `${dest}/${filename}.jpeg`)
 }
 

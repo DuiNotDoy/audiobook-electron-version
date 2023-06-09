@@ -5,7 +5,7 @@ export default function App(): JSX.Element {
 
     function getStories() {
         console.log('clicked')
-        window.electron.ipcRenderer.send('data:request', { filter: 'all' })
+        window.electron.ipcRenderer.send('data:request', { type: 'all' })
         window.electron.ipcRenderer.on('data:response', (e, data) => {
             console.log({ e })
             console.log(data)
@@ -13,8 +13,9 @@ export default function App(): JSX.Element {
     }
 
     function getStory(id: string) {
-        window.electron.ipcRenderer.send('data:request', { filter: 'single', id: id })
+        window.electron.ipcRenderer.send('data:request', { type: 'single', id: id })
         window.electron.ipcRenderer.on('data:response', (e, data) => {
+            console.log({ e })
             console.log({ data })
         })
     }
