@@ -84,14 +84,14 @@ ipcMain.on('data:request', (e, data) => {
     switch (data.type) {
         case 'all':
             const stories = getAllStory()
-            e.reply('data:response', { success: true, data: stories, type: 'multiple' })
+            e.reply('request:response', { success: true, data: stories, type: 'multiple' })
             break;
         case 'single':
             const story = getStory(data.id)
-            e.reply('data:response', { success: true, data: story, type: 'single' })
+            e.reply('request:response', { success: true, data: story, type: 'single' })
             break;
         default:
-            e.reply('data:response', { success: false, data: null, type: 'error' })
+            e.reply('request:response', { success: false, data: null, type: 'error' })
             break;
     }
 })
@@ -99,9 +99,27 @@ ipcMain.on('data:request', (e, data) => {
 ipcMain.on('data:post', (e, data) => {
     console.log({ e })
 
+    const stories = [
+        {
+            id: 'id-1',
+            title: 'story-1',
+            author: 'author-1'
+        },
+        {
+            id: 'id-2',
+            title: 'story-2',
+            author: 'author-2'
+        },
+    ]
+
+    const mainPath = createMainPathIfNotExists()
+    fs.writeFileSync(`${mainPath}/data/data.json`, JSON.stringify({ stories: stories }))
+
     switch (data.type) {
         case 'insert':
-            // code for inserting data here...
+            const mainData = jsonifiedData()
+            console.log(mainData)
+            e.reply('post:response', { success: true, data: mainData })
             break
         case 'update':
             // code for updating data here...
@@ -153,3 +171,8 @@ function createMainPathIfNotExists(): string {
     return mainPath
 }
 
+function jsonifiedData() {
+    const mainPath = createMainPathIfNotExists()
+    const mainData = fs.readFileSync(`${mainPath}/data/data.json`, { encoding: 'utf8' })
+    return JSON.parse(mainData)
+}
