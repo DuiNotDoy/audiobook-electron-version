@@ -65,8 +65,8 @@ app.whenReady().then(() => {
     })
 })
 
-ipcMain.on('media:save', (e, data) => {
-    const { storyTitle, audioPath, thumbNailPath } = data
+ipcMain.on('media:save', (e, values) => {
+    const { storyTitle, audioPath, thumbNailPath } = values
     const mainPath = createMainPathIfNotExists()
 
     try {
@@ -78,16 +78,16 @@ ipcMain.on('media:save', (e, data) => {
     }
 })
 
-ipcMain.on('data:request', (e, data) => {
+ipcMain.on('data:request', (e, values) => {
     console.log({ e })
 
-    switch (data.type) {
+    switch (values.type) {
         case 'all':
             const stories = getAllStory()
             e.reply('request:response', { success: true, data: stories, type: 'multiple' })
             break;
         case 'single':
-            const story = getStory(data.id)
+            const story = getStory(values.id)
             e.reply('request:response', { success: true, data: story, type: 'single' })
             break;
         default:
@@ -96,30 +96,31 @@ ipcMain.on('data:request', (e, data) => {
     }
 })
 
-ipcMain.on('data:post', (e, data) => {
+ipcMain.on('data:post', (e, values) => {
     console.log({ e })
 
-    const stories = [
-        {
-            id: 'id-1',
-            title: 'story-1',
-            author: 'author-1'
-        },
-        {
-            id: 'id-2',
-            title: 'story-2',
-            author: 'author-2'
-        },
-    ]
+    const mainData = jsonifiedData()
 
-    const mainPath = createMainPathIfNotExists()
-    fs.writeFileSync(`${mainPath}/data/data.json`, JSON.stringify({ stories: stories }))
-
-    switch (data.type) {
+    switch (values.type) {
         case 'insert':
-            const mainData = jsonifiedData()
-            console.log(mainData)
-            e.reply('post:response', { success: true, data: mainData })
+            const storyDuplicate = mainData.stories.find(story => story.id === values.data.id)
+
+            // If undefined, meaning data does not exist yet in the records
+            if (!storyDuplicate) {
+                // update stories
+                const updatedStories = [...mainData.stories, values.data]
+
+                // write the updated stories to json file
+                const mainPath = `${os.homedir()}/Music/audiobook-data/data`
+                const updatedData = { stories: updatedStories }
+                fs.writeFileSync(`${mainPath}/data.json`, JSON.stringify(updatedData))
+
+                // send updated data to frontend
+                e.reply('post:response', { success: true, data: updatedStories })
+                return
+            }
+
+            e.reply('post:response', { success: false, data: mainData.stories })
             break
         case 'update':
             // code for updating data here...
@@ -171,7 +172,12 @@ function createMainPathIfNotExists(): string {
     return mainPath
 }
 
-function jsonifiedData() {
+type Story = {
+    id: string,
+    title: string,
+    author: string
+}
+function jsonifiedData(): { stories: Story[] } {
     const mainPath = createMainPathIfNotExists()
     const mainData = fs.readFileSync(`${mainPath}/data/data.json`, { encoding: 'utf8' })
     return JSON.parse(mainData)
