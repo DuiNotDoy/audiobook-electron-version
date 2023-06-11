@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import Loading from './Loader'
+import type { Story } from 'src/types/story'
 
 export default function AddBookModal(): JSX.Element {
     const [open, setopen] = useState(false)
@@ -20,19 +21,23 @@ export default function AddBookModal(): JSX.Element {
             return handleError({ error: 'Empty Field', message: 'Do not leave an empty field' })
         }
 
-        const mediaData = {
-            storyTitle: title.current?.value,
-            audioPath: audioFile?.path,
-            thumbNailPath: thumbNail?.path
+        const storyData: Story = {
+            title: title.current!.value,
+            author: author.current!.value,
+            story: story.current!.value,
+            audioPath: audioFile!.path,
+            thumbnailPath: thumbNail!.path,
+            specialWords: specialWords.current!.value.split(',')
         }
 
-        window.electron.ipcRenderer.send('media:save', mediaData)
-        window.electron.ipcRenderer.on('media:response', (e, data) => {
+        window.electron.ipcRenderer.send('data:post', { type: 'insert', data: storyData })
+        window.electron.ipcRenderer.on('post:response', (e, values) => {
             console.log({ e })
-            console.log(data)
-            if (!data.success) {
+            console.log(values)
+            if (!values.success) {
                 handleError({ error: 'Crashed', message: 'Error occurred while saving media' })
             }
+            console.log(values.data)
             setsubmitting(false)
         })
     }

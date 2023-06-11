@@ -1,11 +1,13 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import fs from 'fs'
-import os from 'os'
-import { join } from 'path'
 import { createMainPathIfNotExists } from './utils/createPath'
+import { saveAudio, saveThumbnail } from './utils/mediaSave'
+import { updateStory } from './utils/updateStory'
 import { jsonifiedData } from './utils/jsonify'
+import { join } from 'path'
+import { randomUUID } from 'crypto'
+import type { Story } from '../types/story'
 
 function createWindow(): void {
     // Create the browser window.
@@ -66,19 +68,6 @@ app.whenReady().then(() => {
     })
 })
 
-ipcMain.on('media:save', (e, values) => {
-    const { storyTitle, audioPath, thumbNailPath } = values
-    const mainPath = createMainPathIfNotExists()
-
-    try {
-        fs.copyFileSync(audioPath, `${mainPath}/${storyTitle}.mp3`)
-        fs.copyFileSync(thumbNailPath, `${mainPath}/${storyTitle}.jpeg`)
-        e.reply('media:response', { success: true, message: 'successfully saved media' })
-    } catch (error) {
-        e.reply('media:response', { success: false, message: 'error occurred while saving the files' })
-    }
-})
-
 ipcMain.on('data:request', (e, values) => {
     console.log({ e })
 
@@ -101,27 +90,34 @@ ipcMain.on('data:post', (e, values) => {
     console.log({ e })
 
     const mainData = jsonifiedData()
+    console.log(values.data)
 
     switch (values.type) {
         case 'insert':
-            const storyDuplicate = mainData.stories.find(story => story.id === values.data.id)
+            const storyDuplicate = mainData.stories.find(story => story.title === values.data.title)
 
-            // If undefined, meaning data does not exist yet in the records
-            if (!storyDuplicate) {
-                // update stories
-                const updatedStories = [...mainData.stories, values.data]
-
-                // write the updated stories to json file
-                const mainPath = `${os.homedir()}/Music/audiobook-data/data`
-                const updatedData = { stories: updatedStories }
-                fs.writeFileSync(`${mainPath}/data.json`, JSON.stringify(updatedData))
-
-                // send updated data to frontend
-                e.reply('post:response', { success: true, data: updatedStories })
+            // If storyDuplicate has a value, notify the frontend that the story already exists, else continue
+            if (storyDuplicate) {
+                e.reply('post:response', { success: false, data: mainData.stories })
                 return
             }
 
-            e.reply('post:response', { success: false, data: mainData.stories })
+            const audioPath = saveAudio(values.data.audioPath, values.data.title)
+            const thumbnailPath = saveThumbnail(values.data.thumbnailPath, values.data.title)
+            const newStory: Story = {
+                id: randomUUID(),
+                title: values.data.title,
+                author: values.data.author,
+                story: values.data.story,
+                audioPath: audioPath,
+                thumbnailPath: thumbnailPath,
+                specialWords: values.data.specialWords
+            }
+
+            const updatedStories = updateStory(newStory, mainData.stories)
+
+            // send updated data to frontend
+            e.reply('post:response', { success: true, data: updatedStories })
             break
         case 'update':
             // code for updating data here...
