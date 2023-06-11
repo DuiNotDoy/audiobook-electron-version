@@ -4,7 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import os from 'os'
-import { getAllStory, getStory } from './database'
+import { createMainPathIfNotExists } from './utils/createPath'
+import { jsonifiedData } from './utils/jsonify'
 
 function createWindow(): void {
     // Create the browser window.
@@ -54,6 +55,8 @@ app.whenReady().then(() => {
     })
 
     //create folder for saving data
+    //createMainPathIfNotExists()
+
     createMainPathIfNotExists()
 
     createWindow()
@@ -83,12 +86,12 @@ ipcMain.on('data:request', (e, values) => {
 
     switch (values.type) {
         case 'all':
-            const stories = getAllStory()
-            e.reply('request:response', { success: true, data: stories, type: 'multiple' })
+            const stories = jsonifiedData().stories
+            e.reply('request:response:all', { success: true, data: stories })
             break;
         case 'single':
-            const story = getStory(values.id)
-            e.reply('request:response', { success: true, data: story, type: 'single' })
+            const story = {}
+            e.reply('request:response:single', { success: true, data: story })
             break;
         default:
             e.reply('request:response', { success: false, data: null, type: 'error' })
@@ -145,40 +148,4 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-function createMainPathIfNotExists(): string {
-    const home = os.homedir()
-    const mainPath = `${home}/Music/audiobook-data`
 
-    // Create main folder for app data if it does not exists
-    if (!fs.existsSync(mainPath)) {
-        fs.mkdirSync(mainPath)
-    }
-
-    // Create subfolder for audios if it does not exist
-    if (!fs.existsSync(`${mainPath}/audios`)) {
-        fs.mkdirSync(`${mainPath}/audios`)
-    }
-
-    // Create subfolder for thumbnails if it does not exist
-    if (!fs.existsSync(`${mainPath}/thumbnails`)) {
-        fs.mkdirSync(`${mainPath}/thumbnails`)
-    }
-
-    // Create subfolder for main data if it does not exists
-    if (!fs.existsSync(`${mainPath}/data`)) {
-        fs.mkdirSync(`${mainPath}/data`)
-    }
-
-    return mainPath
-}
-
-type Story = {
-    id: string,
-    title: string,
-    author: string
-}
-function jsonifiedData(): { stories: Story[] } {
-    const mainPath = createMainPathIfNotExists()
-    const mainData = fs.readFileSync(`${mainPath}/data/data.json`, { encoding: 'utf8' })
-    return JSON.parse(mainData)
-}

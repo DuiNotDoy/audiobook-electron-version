@@ -1,0 +1,20 @@
+import { useEffect } from "react"
+
+export default function BookList() {
+    useEffect(() => {
+        () => {
+            window.electron.ipcRenderer.send('data:request', { type: 'all' })
+            window.electron.ipcRenderer.on('request:response', (e, values) => {
+                console.log({ e })
+                console.log({ values })
+            })
+        }
+    }, [])
+    return (
+        <div className="max-w-4xl p-2 mx-auto outline outline-1">
+            <div className="flex gap-2 flex-wrap">
+                <h1>book list</h1>
+            </div>
+        </div>
+    )
+}

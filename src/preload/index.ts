@@ -4,7 +4,7 @@ import Buffer from 'node:buffer'
 
 // Custom APIs for renderer
 const api = {
-    buffer: (arrayBuffer) => Buffer.Buffer.from(arrayBuffer)
+    buffer: (arrayBuffer) => Buffer.Buffer.from(arrayBuffer),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -23,3 +23,4 @@ if (process.contextIsolated) {
     // @ts-ignore (define in dts)
     window.api = api
 }
+
