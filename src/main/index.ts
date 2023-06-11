@@ -1,9 +1,9 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import os from 'os'
+import { join } from 'path'
 import { createMainPathIfNotExists } from './utils/createPath'
 import { jsonifiedData } from './utils/jsonify'
 
@@ -55,8 +55,6 @@ app.whenReady().then(() => {
     })
 
     //create folder for saving data
-    //createMainPathIfNotExists()
-
     createMainPathIfNotExists()
 
     createWindow()

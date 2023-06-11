@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react"
-
-type Story = {
-    id: string,
-    title: string,
-    author: string
-}
+import type { Story } from '../../../types/story'
 
 export default function BookList() {
     const [stories, setstories] = useState<Story[]>([])
