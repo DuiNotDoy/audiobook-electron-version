@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, Menu } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMainPathIfNotExists } from './utils/createPath'
@@ -6,9 +6,25 @@ import { saveAudio, saveThumbnail } from './utils/mediaSave'
 import { updateStory } from './utils/updateStory'
 import { jsonifiedData } from './utils/jsonify'
 import { join } from 'path'
+import fs from 'fs'
 import { randomUUID } from 'crypto'
 import type { Story } from '../types/story'
 import { dropStories } from './utils/dropStories'
+
+const menuTemplate = [
+    {
+        role: 'fileMenu'
+    },
+    {
+        role: 'windowMenu'
+    },
+    {
+        role: 'reload'
+    },
+    {
+        role: 'about'
+    }
+]
 
 function createWindow(): void {
     // Create the browser window.
@@ -44,10 +60,28 @@ function createWindow(): void {
     }
 }
 
+app.setAboutPanelOptions({
+    authors: [
+        'John Loyd Mulit',
+        'Lee Martin Boja',
+        'Regine Dorothy Joy Saliot',
+        'Hazel Ross Tomol',
+        'Barky Anne Colas',
+        'Arianne Faith Malubay'
+    ],
+    applicationName: 'Audiobook',
+    iconPath: `${fs.realpathSync('./resources')}/icon.png`,
+    website: 'https://audiobook-phi.vercel.app/',
+    applicationVersion: '1.0.0',
+    copyright: 'To God be all the glory'
+})
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+    const mainMenu = Menu.buildFromTemplate(menuTemplate)
+    Menu.setApplicationMenu(mainMenu)
 
     protocol.registerFileProtocol('file', (request, callback) => {
         const pathname = decodeURI(request.url.replace('file:///', ''));
