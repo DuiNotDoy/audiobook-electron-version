@@ -71,9 +71,9 @@ app.setAboutPanelOptions({
     ],
     applicationName: 'Audiobook',
     iconPath: `${fs.realpathSync('./resources')}/icon.png`,
-    website: 'https://audiobook-phi.vercel.app/',
+    website: 'https://github.com/DuiNotDoy/audiobook-electron-version',
     applicationVersion: '1.0.0',
-    copyright: 'To God be all the glory'
+    copyright: 'To God be all the glory',
 })
 
 // This method will be called when Electron has finished
