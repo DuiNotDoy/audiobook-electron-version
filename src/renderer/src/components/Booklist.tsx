@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
-import type { Story } from '../../../types/story'
 import { Link } from "react-router-dom"
-import cover from '../../../../resources/sample-cover.jpg'
+import type { Story } from '../../../types/story'
 
 export default function BookList() {
     const [stories, setstories] = useState<Story[]>([])
@@ -25,7 +24,7 @@ export default function BookList() {
                 {
                     stories.map(story => (
                         <Link to={`/book/${story.id}`} state={story} key={story.id} className="outline outline-1 p-1 rounded text-center w-44 hover:shadow-lg">
-                            <img className="rounded h-48 w-full object-cover" src={cover} />
+                            <img className="rounded h-48 w-full object-cover" src={`file://${story.thumbnailPath}`} />
                             <h1 className="text-lg">{story.title}</h1>
                             <p className="">{story.author}</p>
                         </Link>
