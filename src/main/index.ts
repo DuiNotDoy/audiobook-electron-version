@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMainPathIfNotExists } from './utils/createPath'
@@ -8,6 +8,7 @@ import { jsonifiedData } from './utils/jsonify'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
 import type { Story } from '../types/story'
+import { dropStories } from './utils/dropStories'
 
 function createWindow(): void {
     // Create the browser window.
@@ -19,7 +20,8 @@ function createWindow(): void {
         ...(process.platform === 'linux' ? { icon } : {}),
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
-            sandbox: false
+            sandbox: false,
+            webSecurity: false
         }
     })
 
@@ -46,6 +48,12 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+
+    protocol.registerFileProtocol('file', (request, callback) => {
+        const pathname = decodeURI(request.url.replace('file:///', ''));
+        callback(pathname);
+    });
+
     // Set app user model id for windows
     electronApp.setAppUserModelId('com.electron')
 
@@ -124,6 +132,10 @@ ipcMain.on('data:post', (e, values) => {
             break
         case 'delete':
             // code for deleting data here...
+            break
+        case 'drop':
+            dropStories()
+            e.reply('post:response', { success: true, data: [] })
             break
         default:
             break

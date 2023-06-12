@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom"
+
 export default function Topbar(): JSX.Element {
     return (
         <div className="bg-yellow-500 flex justify-between items-center px-4 py-2">
@@ -5,12 +7,12 @@ export default function Topbar(): JSX.Element {
                 <p className="text-center text-sm">logo</p>
             </div>
             <div>
-                <a href={'/'}>Audiobook</a>
+                <Link to={'/'}>Audiobook</Link>
             </div>
             <div>
-                <a href={'/about'} className="hover:underline">
+                <Link to={'/about'} className="hover:underline">
                     About Us
-                </a>
+                </Link>
             </div>
         </div>
     )

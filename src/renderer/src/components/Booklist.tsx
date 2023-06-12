@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 import type { Story } from '../../../types/story'
+import { Link } from "react-router-dom"
+import cover from '../../../../resources/sample-cover.jpg'
 
 export default function BookList() {
     const [stories, setstories] = useState<Story[]>([])
@@ -22,10 +24,11 @@ export default function BookList() {
             <div className="flex gap-4 flex-wrap justify-center">
                 {
                     stories.map(story => (
-                        <div key={story.id} className="outline outline-1 p-2 rounded text-center w-52">
+                        <Link to={`/book/${story.id}`} state={story} key={story.id} className="outline outline-1 p-1 rounded text-center w-44 hover:shadow-lg">
+                            <img className="rounded h-48 w-full object-cover" src={cover} />
                             <h1 className="text-lg">{story.title}</h1>
                             <p className="">{story.author}</p>
-                        </div>
+                        </Link>
                     ))
                 }
             </div>
