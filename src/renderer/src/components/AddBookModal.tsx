@@ -39,6 +39,7 @@ export default function AddBookModal(): JSX.Element {
             }
             console.log(values.data)
             setsubmitting(false)
+            window.location.reload()
         })
     }
 
