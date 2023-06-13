@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import Loading from './Loader'
 import type { Story } from 'src/types/story'
+import { BooksContext } from '@renderer/BooksContext'
 
 export default function AddBookModal(): JSX.Element {
     const [open, setopen] = useState(false)
@@ -14,6 +15,7 @@ export default function AddBookModal(): JSX.Element {
     const [hasAudio, sethasAudio] = useState(false)
     const [hasImage, sethasImage] = useState(false)
     const [hasError, sethasError] = useState(false)
+    const { setInsertCounter } = useContext(BooksContext)
 
     function fileUpload(): void {
         setsubmitting(true)
@@ -37,9 +39,10 @@ export default function AddBookModal(): JSX.Element {
             if (!values.success) {
                 handleError({ error: 'Crashed', message: 'Error occurred while saving media' })
             }
-            console.log(values.data)
+            console.log('inserted story: ', values.data)
+            setInsertCounter((current: number) => current + 1)
+            setopen(false)
             setsubmitting(false)
-            window.location.reload()
         })
     }
 
