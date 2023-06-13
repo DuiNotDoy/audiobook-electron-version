@@ -24,9 +24,9 @@ export function saveThumbnail(src: string, filename: string) {
 
     let dest: string = ''
     if (platform.isWindows) {
-        dest = `${mainPath}\audios\${filename}.jpeg`
+        dest = `${mainPath}\thumbnails\${filename}.jpeg`
     } else {
-        dest = `${mainPath}/audios/${filename}.jpeg`
+        dest = `${mainPath}/thumbnails/${filename}.jpeg`
     }
     fs.copyFileSync(src, dest)
     return dest
