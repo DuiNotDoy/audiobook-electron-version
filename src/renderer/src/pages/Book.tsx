@@ -1,12 +1,16 @@
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { Story } from "src/types/story"
 
 export default function Book() {
+    const navigate = useNavigate()
     const location = useLocation()
     const story: Story = location.state
 
     return (
         <div className="max-w-2xl mx-auto p-2">
+            <div>
+                <button className="bg-red-400 px-2 py-1 rounded" onClick={() => navigate(-1)}>back</button>
+            </div>
             <div className="text-center my-4">
                 <h1 className="font-bold uppercase">{story.title}</h1>
                 <p className="font-light">{story.author}</p>
