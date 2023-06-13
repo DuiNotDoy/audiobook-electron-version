@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, protocol, Menu } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, Menu, MenuItem } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMainPathIfNotExists } from './utils/createPath'
@@ -12,18 +12,9 @@ import type { Story } from '../types/story'
 import { dropStories } from './utils/dropStories'
 
 const menuTemplate = [
-    {
-        role: 'fileMenu'
-    },
-    {
-        role: 'windowMenu'
-    },
-    {
-        role: 'reload'
-    },
-    {
-        role: 'about'
-    }
+    new MenuItem({ role: 'fileMenu' }),
+    new MenuItem({ role: 'windowMenu' }),
+    new MenuItem({ role: 'about' }),
 ]
 
 function createWindow(): void {
