@@ -64,7 +64,7 @@ app.setAboutPanelOptions({
     authors: [
         'John Loyd Mulit',
         'Lee Martin Boja',
-        'Regine Dorothy Joy Saliot',
+        'Regine Joy Dorothy Saliot',
         'Hazel Ross Tomol',
         'Barky Anne Colas',
         'Arianne Faith Malubay'

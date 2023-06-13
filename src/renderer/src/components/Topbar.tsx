@@ -10,8 +10,8 @@ export default function Topbar(): JSX.Element {
                 <Link to={'/'}>Audiobook</Link>
             </div>
             <div>
-                <Link to={'/about'} className="hover:underline">
-                    About Us
+                <Link to={'/admin'} className="hover:underline">
+                    Admin
                 </Link>
             </div>
         </div>
