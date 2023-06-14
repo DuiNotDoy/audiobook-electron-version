@@ -9,11 +9,11 @@ import { BooksContext } from './BooksContext'
 
 export default function App(): JSX.Element {
     const [stories, setStories] = useState<Story[]>([])
-    const [insertCounter, setInsertCounter] = useState(0)
+    const [triggerRefetchCounter, setTriggerRefetchCounter] = useState(0)
 
     useEffect(() => {
         getStories()
-    }, [insertCounter])
+    }, [triggerRefetchCounter])
 
     function getStories() {
         window.electron.ipcRenderer.send('data:request', { type: 'all' })
@@ -24,7 +24,7 @@ export default function App(): JSX.Element {
     }
 
     return (
-        <BooksContext.Provider value={{ stories, setStories, setInsertCounter }}>
+        <BooksContext.Provider value={{ stories, setStories, setTriggerRefetchCounter }}>
             <Topbar />
             <Routes>
                 <Route path='/' element={<Home />} />

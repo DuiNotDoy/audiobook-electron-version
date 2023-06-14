@@ -15,7 +15,7 @@ export default function AddBookModal(): JSX.Element {
     const [hasAudio, sethasAudio] = useState(false)
     const [hasImage, sethasImage] = useState(false)
     const [hasError, sethasError] = useState(false)
-    const { setInsertCounter } = useContext(BooksContext)
+    const { setTriggerRefetchCounter } = useContext(BooksContext)
 
     function fileUpload(): void {
         setsubmitting(true)
@@ -40,7 +40,7 @@ export default function AddBookModal(): JSX.Element {
                 handleError({ error: 'Crashed', message: 'Error occurred while saving media' })
             }
             console.log('inserted story: ', values.data)
-            setInsertCounter((current: number) => current + 1)
+            setTriggerRefetchCounter((current: number) => current + 1)
             setopen(false)
             setsubmitting(false)
         })
