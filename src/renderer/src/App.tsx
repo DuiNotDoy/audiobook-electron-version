@@ -27,7 +27,7 @@ export default function App(): JSX.Element {
         <BooksContext.Provider value={{ stories, setStories, setTriggerRefetchCounter }}>
             <Topbar />
             <Routes>
-                <Route path='/' element={<Home />} />
+            <Route path='*' element={<Home />} />
                 <Route path='/admin' element={<Admin />} />
                 <Route path='/book/:id' element={<Book />} />
             </Routes>

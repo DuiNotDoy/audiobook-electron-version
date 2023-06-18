@@ -2,14 +2,17 @@ import { app, shell, BrowserWindow, ipcMain, protocol, Menu, MenuItem } from 'el
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createMainPathIfNotExists } from './utils/createPath'
-import { saveAudio, saveThumbnail } from './utils/mediaSave'
+import { saveAudio } from './utils/saveAudio'
+import { saveThumbnail } from './utils/saveThumbnail'
 import { updateStory } from './utils/updateStory'
 import { jsonifiedData } from './utils/jsonify'
 import { join } from 'path'
 import fs from 'fs'
 import { randomUUID } from 'crypto'
-import type { Story } from '../types/story'
+import type { SpecialWordsEntry, Story } from '../types/story'
 import { dropStories } from './utils/dropStories'
+import { saveConvertedAudio } from './utils/saveConvertedAudio'
+import { saveConvertV2 } from './utils/saveConvertedV2'
 
 const menuTemplate = [
     new MenuItem({ role: 'fileMenu' }),
@@ -102,7 +105,6 @@ app.whenReady().then(() => {
 })
 
 ipcMain.on('data:request', (e, values) => {
-    console.log({ e })
 
     switch (values.type) {
         case 'all':
@@ -119,11 +121,9 @@ ipcMain.on('data:request', (e, values) => {
     }
 })
 
-ipcMain.on('data:post', (e, values) => {
-    console.log({ e })
+ipcMain.on('data:post', async (e, values) => {
 
     const mainData = jsonifiedData()
-    console.log(values.data)
 
     switch (values.type) {
         case 'insert':
@@ -137,6 +137,22 @@ ipcMain.on('data:post', (e, values) => {
 
             const audioPath = saveAudio(values.data.audioPath, values.data.title)
             const thumbnailPath = saveThumbnail(values.data.thumbnailPath, values.data.title)
+            const convertedWords: SpecialWordsEntry[] = []
+
+            for (const word of values.data.specialWords) {
+                console.log(`converting: ${word}`)
+                const audioPromise = await saveConvertedAudio(word)
+                if (audioPromise.success) {
+                    console.log('inside promise check: ', audioPromise)
+                    convertedWords.push({
+                        word,
+                        path: audioPromise.data
+                    })
+                }
+                console.log({ convertedWords })
+            }
+            console.log('loop ended')
+
             const newStory: Story = {
                 id: randomUUID(),
                 title: values.data.title,
@@ -144,8 +160,10 @@ ipcMain.on('data:post', (e, values) => {
                 story: values.data.story,
                 audioPath: audioPath,
                 thumbnailPath: thumbnailPath,
-                specialWords: values.data.specialWords
+                specialWords: convertedWords
             }
+
+            console.log('new story: ', JSON.stringify(newStory))
 
             const updatedStories = updateStory(newStory, mainData.stories)
 

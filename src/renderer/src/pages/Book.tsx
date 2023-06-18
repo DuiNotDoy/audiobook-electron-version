@@ -33,7 +33,14 @@ export default function Book() {
                     {
                         story.specialWords.map((word, idx) => (
                             <div key={idx} className="text-center">
-                                <h3>{word}</h3>
+                                <h3>{word.word}</h3>
+                                <div className="flex justify-center">
+                                    <audio
+                                        controls
+                                        controlsList="nodownload"
+                                        src={`file://${word.path}`}
+                                    ></audio>
+                                </div>
                             </div>
                         ))
                     }

@@ -15,6 +15,11 @@ export function createMainPathIfNotExists(): string {
         fs.mkdirSync(`${mainPath}/audios`)
     }
 
+    // Create subfolder for converted audios for special words if not exists
+    if (!fs.existsSync(`${mainPath}/converted`)) {
+        fs.mkdirSync(`${mainPath}/converted`)
+    }
+    
     // Create subfolder for thumbnails if it does not exist
     if (!fs.existsSync(`${mainPath}/thumbnails`)) {
         fs.mkdirSync(`${mainPath}/thumbnails`)

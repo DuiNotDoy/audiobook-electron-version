@@ -6,5 +6,7 @@ export type Story = {
     story: string,
     audioPath: string,
     thumbnailPath: string,
-    specialWords: string[]
+    specialWords: SpecialWordsEntry[]
 }
+
+export type SpecialWordsEntry = { word: string, path: string }

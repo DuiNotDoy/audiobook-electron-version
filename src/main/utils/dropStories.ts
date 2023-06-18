@@ -18,4 +18,10 @@ export function dropStories() {
     thumbnailFiles.forEach(thumbnail => {
         fs.rmSync(`${mainPath}/thumbnails/${thumbnail}`)
     })
+    
+    // drop all converted audio
+    const convertedAudios = fs.readdirSync(`${mainPath}/converted`, { encoding: 'utf8' })
+    convertedAudios.forEach(converted => {
+        fs.rmSync(`${mainPath}/converted/${converted}`)
+    })
 }

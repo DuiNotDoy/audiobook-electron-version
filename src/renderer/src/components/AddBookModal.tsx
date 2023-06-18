@@ -1,6 +1,5 @@
 import { useContext, useRef, useState } from 'react'
 import Loading from './Loader'
-import type { Story } from 'src/types/story'
 import { BooksContext } from '@renderer/BooksContext'
 
 export default function AddBookModal(): JSX.Element {
@@ -17,13 +16,20 @@ export default function AddBookModal(): JSX.Element {
     const [hasError, sethasError] = useState(false)
     const { setTriggerRefetchCounter } = useContext(BooksContext)
 
+    window.electron.ipcRenderer.on('audio:failed', (e, values) => {
+        console.log({ e })
+        if (values.type === 'warning') {
+            alert(values.data)
+        }
+    })
+
     function fileUpload(): void {
         setsubmitting(true)
         if (hasEmptyField()) {
             return handleError({ error: 'Empty Field', message: 'Do not leave an empty field' })
         }
 
-        const storyData: Story = {
+        const storyData = {
             title: title.current!.value,
             author: author.current!.value,
             story: story.current!.value,
@@ -42,6 +48,8 @@ export default function AddBookModal(): JSX.Element {
             console.log('inserted story: ', values.data)
             setTriggerRefetchCounter((current: number) => current + 1)
             setopen(false)
+            setaudioFile(null)
+            setthumbNail(null)
             setsubmitting(false)
         })
     }
